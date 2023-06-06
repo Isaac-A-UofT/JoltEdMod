@@ -1,0 +1,33 @@
+# .gitignore
+
+# Ignore Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyc
+
+# Ignore virtual environments
+venv/
+.virtualenvs/
+
+# Ignore Poetry files
+dist/
+.pytest_cache/
+.pyre/
+__pypackages__/
+
+# Ignore PyCharm IDE files
+.idea/
+
+# Ignore VSCode IDE files
+.vscode/
+
+# Ignore Jupyter Notebook files
+.ipynb_checkpoints/
+
+# Ignore other files
+*.log
+*.sqlite3
+*.csv
+*.json

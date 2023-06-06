@@ -37,31 +37,13 @@ class ContentGenerator:
         """Create a Jupyter Notebook file from the given config file."""
         nb = nbf.v4.new_notebook()
         blocks = await self.create_content(config_file)
-        await self._generate_notebook_blocks(blocks, nb)
-        return nb
-
-    async def _generate_notebook_blocks(self, blocks, nb):
-        """Generate notebook cells from given blocks asynchronously."""
-        for block in blocks:
-            if block.cell_type == CellType.CODE:
-                new_cell = nbf.v4.new_code_cell(block.content)
-                new_cell['id'] = str(uuid.uuid4())  # Generate and set cell id
-                nb.cells.append(new_cell)
-            elif block.cell_type == CellType.MARKDOWN:
-                nb.cells.append(nbf.v4.new_markdown_cell(block.content))
+        await self._generate_notebook_cells(blocks, nb)
         return nb
 
     async def create_wiki(self, config_file):
         """Create a wiki file from the given config file."""
         blocks = await self.create_content(config_file)
         return await self._create_markdown_text(blocks)
-
-    async def _create_markdown_text(self, blocks):
-        """Create a markdown file from the given blocks."""
-        markdown_text = ""
-        for block in blocks:
-            markdown_text += f"{markdown2.markdown(block.content)}"
-        return markdown_text
 
     async def create_content(self, config_file):
         """Create content for blocks from the given config file asynchronously."""
@@ -77,6 +59,26 @@ class ContentGenerator:
 
             await self._generate_all_block_content(blocks)
             return blocks
+
+
+    async def _generate_notebook_cells(self, blocks, nb):
+        """Generate notebook cells from given blocks asynchronously."""
+        for block in blocks:
+            if block.cell_type == CellType.CODE:
+                new_cell = nbf.v4.new_code_cell(block.content)
+                new_cell['id'] = str(uuid.uuid4())  # Generate and set cell id
+                nb.cells.append(new_cell)
+            elif block.cell_type == CellType.MARKDOWN:
+                nb.cells.append(nbf.v4.new_markdown_cell(block.content))
+        return nb
+
+    async def _create_markdown_text(self, blocks):
+        """Create a markdown file from the given blocks."""
+        markdown_text = ""
+        for block in blocks:
+            markdown_text += (block.content)
+        return markdown_text
+
 
     @staticmethod
     async def _update_context(config_file, blocks):

@@ -1,12 +1,15 @@
-import asyncio
 from jolted_mod.template_generator import TemplateGenerator
 from jolted_mod.content_generator import ContentGenerator
 from typing import Any, Dict
 
 
-async def create_notebook_module(topic: str, identity: str = 'professor of computer science',
-                                 target_audience: str = 'first year computer science students',
-                                 model: str = 'gpt-3.5-turbo') -> Dict[str, Any]:
+async def create_notebook_module(
+    topic: str,
+    identity: str = "professor of computer science",
+    target_audience: str = "first year computer science students",
+    is_code: bool = True,
+    model: str = "gpt-3.5-turbo",
+) -> Dict[str, Any]:
     """
     Creates a notebook module based on the provided topic.
 
@@ -14,6 +17,7 @@ async def create_notebook_module(topic: str, identity: str = 'professor of compu
         topic (str): The topic for the notebook.
         identity (str): The identity of the content creator.
         target_audience (str): The target audience of the notebook.
+        is_code (bool): Whether the wiki should contain code.
         model (str): The AI model used for content generation.
 
     Returns:
@@ -21,23 +25,28 @@ async def create_notebook_module(topic: str, identity: str = 'professor of compu
     """
 
     if not topic:
-        raise ValueError('Topic cannot be empty')
+        raise ValueError("Topic cannot be empty")
 
     # Generate the template
     template_generator = TemplateGenerator(topic, identity, target_audience)
-    tutorial_template = template_generator.save_tutorial_template_to_file(
-        'tutorial_template.json')
+    tutorial_template = template_generator.save_template_to_file(
+        "tutorial_template.json", code=is_code, template_type="notebook"
+    )
 
     # Generate cell content using the ContentGenerator
     cg = ContentGenerator(model=model)
-    tutorial_content = await cg.create_notebook('tutorial_template.json')
+    tutorial_content = await cg.create_notebook("tutorial_template.json")
 
     return tutorial_content
 
 
-async def create_wiki_module(topic: str, identity: str = 'professor of computer science',
-                             target_audience: str = 'first year computer science students',
-                             model: str = 'gpt-3.5-turbo') -> str:
+async def create_wiki_module(
+    topic: str,
+    identity: str = "professor of computer science",
+    target_audience: str = "first year computer science students",
+    is_code: bool = True,
+    model: str = "gpt-3.5-turbo",
+) -> str:
     """
     Creates a wiki module based on the provided topic.
 
@@ -45,6 +54,7 @@ async def create_wiki_module(topic: str, identity: str = 'professor of computer 
         topic (str): The topic for the wiki.
         identity (str): The identity of the content creator.
         target_audience (str): The target audience of the wiki.
+        is_code (bool): Whether the wiki should contain code.
         model (str): The AI model used for content generation.
 
     Returns:
@@ -52,23 +62,28 @@ async def create_wiki_module(topic: str, identity: str = 'professor of computer 
     """
 
     if not topic:
-        raise ValueError('Topic cannot be empty')
+        raise ValueError("Topic cannot be empty")
 
     # Generate the template
     template_generator = TemplateGenerator(topic, identity, target_audience)
-    wiki_template = template_generator.save_wiki_template_to_file(
-        'wiki_template.json')
+    wiki_template = template_generator.save_template_to_file(
+        "wiki_template.json", code=is_code, template_type="wiki"
+    )
 
     # Generate cell content using the ContentGenerator
     cg = ContentGenerator(model=model)
-    wiki_content = await cg.create_wiki('wiki_template.json')
+    wiki_content = await cg.create_wiki("wiki_template.json")
 
     return wiki_content
 
 
-async def create_curriculum(curriculum_data: Dict[str, Any], identity: str = 'Professor of Computer Science',
-                            target_audience: str = 'first year computer science students',
-                            model: str = 'gpt-3.5-turbo') -> Dict[str, Any]:
+async def create_curriculum(
+    curriculum_data: Dict[str, Any],
+    identity: str = "Professor of Computer Science",
+    target_audience: str = "first year computer science students",
+    is_code: bool = True,
+    model: str = "gpt-3.5-turbo",
+) -> Dict[str, Any]:
     """
     Creates a curriculum based on the provided curriculum data.
 
@@ -82,18 +97,25 @@ async def create_curriculum(curriculum_data: Dict[str, Any], identity: str = 'Pr
         Dict[str, Any]: The generated curriculum.
     """
 
-    if 'topics' not in curriculum_data:
+    if "topics" not in curriculum_data:
         raise ValueError(
-            "The curriculum data must contain a 'topics' key with a list of topics.")
+            "The curriculum data must contain a 'topics' key with a list of topics."
+        )
 
     curriculum = {}
-    for topic_index, topic in enumerate(curriculum_data['topics']):
-        topic_name = topic['name']
+    for topic_index, topic in enumerate(curriculum_data["topics"]):
+        topic_name = topic["name"]
         topic_content = {}
-        for subtopic_index, subtopic in enumerate(topic['subtopics']):
-            tutorial_content = await create_notebook_module(subtopic, identity, target_audience, model)
-            wiki_content = await create_wiki_module(subtopic, identity, target_audience, model)
+        for subtopic_index, subtopic in enumerate(topic["subtopics"]):
+            tutorial_content = await create_notebook_module(
+                subtopic, identity, target_audience, is_code, model
+            )
+            wiki_content = await create_wiki_module(
+                subtopic, identity, target_audience, is_code, model
+            )
             topic_content[subtopic] = {
-                "tutorial": tutorial_content, "wiki": wiki_content}
+                "tutorial": tutorial_content,
+                "wiki": wiki_content,
+            }
         curriculum[topic_name] = topic_content
     return curriculum

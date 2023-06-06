@@ -1,9 +1,12 @@
 from abc import ABC, abstractmethod
 from jolted_mod.cell_type import CellType
+from jolted_mod.config import prompts
 
 
 class Block(ABC):
-    def __init__(self, cell_type: CellType, content: str = "", context=None, type="Base"):
+    def __init__(
+        self, cell_type: CellType, content: str = "", context=None, type="Base"
+    ):
         self.cell_type = cell_type
         self.context = context
         self.content = content
@@ -20,16 +23,26 @@ class Block(ABC):
         pass
 
 
-
 class SeedBlock(Block):
-    def __init__(self, identity: str, topic: str, target_audience: str, context=None, type="SeedBlock"):
+    def __init__(
+        self,
+        identity: str,
+        topic: str,
+        target_audience: str,
+        context=None,
+        type="SeedBlock",
+    ):
         self.identity = identity
         self.topic = topic
         self.target_audience = target_audience
         super().__init__(CellType.MARKDOWN, type=type)
 
     def generate_prompt(self) -> str:
-        return f"Behave as a {self.identity} who is explaining {self.topic} to {self.target_audience}"
+        return prompts["SeedBlock"].format(
+            identity=self.identity,
+            topic=self.topic,
+            target_audience=self.target_audience,
+        )
 
 
 class ExplanatoryBlock(Block):
@@ -40,7 +53,7 @@ class ExplanatoryBlock(Block):
         target_audience: str,
         cell_type: str,
         context=None,
-        type="ExplanatoryBlock"
+        type="ExplanatoryBlock",
     ):
         self.topic = topic
         self.method_of_teaching = method_of_teaching
@@ -48,10 +61,13 @@ class ExplanatoryBlock(Block):
         super().__init__(CellType[cell_type.upper()], type=type)
 
     def generate_prompt(self) -> str:
-        type_of_cell = (
-            "Markdown" if self.cell_type == CellType.MARKDOWN else "Code"
+        type_of_cell = "Markdown" if self.cell_type == CellType.MARKDOWN else "Code"
+        return prompts["ExplanatoryBlock"].format(
+            type_of_cell=type_of_cell,
+            topic=self.topic,
+            method_of_teaching=self.method_of_teaching,
+            target_audience=self.target_audience,
         )
-        return f"This is a {type_of_cell} block in a Jupyter Notebook. Use appropriate headers for chapter sections if of type Markdown. Do not give solutions if this is a Code block. Explain {self.topic} by {self.method_of_teaching} in a way that is relatable to {self.target_audience}. Be careful not to be overly dramatic and not to talk down to the audience."
 
 
 class KnowledgeTestingBlock(Block):
@@ -63,7 +79,7 @@ class KnowledgeTestingBlock(Block):
         topic: str,
         cell_type: str,
         context=None,
-        type="KnowledgeTestingBlock"
+        type="KnowledgeTestingBlock",
     ):
         self.n = n
         self.question_type = question_type
@@ -73,7 +89,18 @@ class KnowledgeTestingBlock(Block):
 
     def generate_prompt(self) -> str:
         if self.cell_type == CellType.MARKDOWN:
-            return f"Design {self.n} {self.question_type} of an appropriate difficulty for {self.target_audience} about that {self.topic}"
+            return prompts["KnowledgeTestingBlock"]["markdown"].format(
+                n=self.n,
+                question_type=self.question_type,
+                target_audience=self.target_audience,
+                topic=self.topic,
+            )
         else:
-            if self.context:
-                return f"Create code with empty methods that have comments for what they should do but no implementation to answer the following question: {self.context.content}. After that, create 3 assertion tests that the student will use to test if they have implemented their"
+            context_content = self.context.content if self.context else ""
+            return prompts["KnowledgeTestingBlock"]["code"].format(
+                n=self.n,
+                question_type=self.question_type,
+                target_audience=self.target_audience,
+                topic=self.topic,
+                context_content=context_content,
+            )
