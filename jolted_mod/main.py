@@ -1,6 +1,33 @@
 from jolted_mod.template_generator import TemplateGenerator
 from jolted_mod.content_generator import ContentGenerator
-from typing import Any, Dict
+from typing import Any, Dict, Optional
+from jolted_mod.module_types import ModuleType
+import asyncio
+
+# import nbformat as nbf
+
+
+class JoltedModException(Exception):
+    """
+    Custom exception type for Jolted Mod.
+    """
+
+
+async def get_default_notebook_template(
+    topic: str,
+    identity: str = "professor of computer science",
+    target_audience: str = "first year computer science students",
+    is_code: bool = True,
+) -> Dict[str, Any]:
+    try:
+        template_generator = TemplateGenerator(topic, identity, target_audience)
+        template = template_generator.create_template(
+            code=is_code, template_type="notebook"
+        )
+        return template
+    except Exception as e:
+        raise Exception(f"Error occurred: {e}")
+        return {}
 
 
 async def create_notebook_module(
@@ -9,34 +36,29 @@ async def create_notebook_module(
     target_audience: str = "first year computer science students",
     is_code: bool = True,
     model: str = "gpt-3.5-turbo",
+    template: Optional[dict] = None,
 ) -> Dict[str, Any]:
-    """
-    Creates a notebook module based on the provided topic.
+    try:
+        if not topic:
+            raise ValueError("Topic cannot be empty")
 
-    Args:
-        topic (str): The topic for the notebook.
-        identity (str): The identity of the content creator.
-        target_audience (str): The target audience of the notebook.
-        is_code (bool): Whether the wiki should contain code.
-        model (str): The AI model used for content generation.
+        # Generate the template
+        if not template:
+            template_generator = TemplateGenerator(topic, identity, target_audience)
+            template = template_generator.create_template(
+                code=is_code, template_type="notebook"
+            )
+    except Exception as e:
+        raise JoltedModException("Error generating notebook template.") from e
 
-    Returns:
-        Dict[str, Any]: The generated notebook content.
-    """
+    try:
+        # Generate cell content using the ContentGenerator
+        cg = ContentGenerator(model=model)
+        tutorial_content = await cg.create_module(template, type=ModuleType.NOTEBOOK)
+    except Exception as e:
+        raise JoltedModException("Error generating notebook content.") from e
 
-    if not topic:
-        raise ValueError("Topic cannot be empty")
-
-    # Generate the template
-    template_generator = TemplateGenerator(topic, identity, target_audience)
-    tutorial_template = template_generator.save_template_to_file(
-        "tutorial_template.json", code=is_code, template_type="notebook"
-    )
-
-    # Generate cell content using the ContentGenerator
-    cg = ContentGenerator(model=model)
-    tutorial_content = await cg.create_notebook("tutorial_template.json")
-
+    # nbf.write(tutorial_content, "test.ipynb")
     return tutorial_content
 
 
@@ -46,33 +68,27 @@ async def create_wiki_module(
     target_audience: str = "first year computer science students",
     is_code: bool = True,
     model: str = "gpt-3.5-turbo",
+    template: Optional[dict] = None,
 ) -> str:
-    """
-    Creates a wiki module based on the provided topic.
+    try:
+        if not topic:
+            raise ValueError("Topic cannot be empty")
 
-    Args:
-        topic (str): The topic for the wiki.
-        identity (str): The identity of the content creator.
-        target_audience (str): The target audience of the wiki.
-        is_code (bool): Whether the wiki should contain code.
-        model (str): The AI model used for content generation.
+        # Generate the template
+        if not template:
+            template_generator = TemplateGenerator(topic, identity, target_audience)
+            template = template_generator.create_template(
+                code=is_code, template_type="wiki"
+            )
+    except Exception as e:
+        raise JoltedModException("Error generating wiki template.") from e
 
-    Returns:
-        str: The generated wiki content in markdown format.
-    """
-
-    if not topic:
-        raise ValueError("Topic cannot be empty")
-
-    # Generate the template
-    template_generator = TemplateGenerator(topic, identity, target_audience)
-    wiki_template = template_generator.save_template_to_file(
-        "wiki_template.json", code=is_code, template_type="wiki"
-    )
-
-    # Generate cell content using the ContentGenerator
-    cg = ContentGenerator(model=model)
-    wiki_content = await cg.create_wiki("wiki_template.json")
+    try:
+        # Generate cell content using the ContentGenerator
+        cg = ContentGenerator(model=model)
+        wiki_content = await cg.create_module(template, type=ModuleType.WIKI)
+    except Exception as e:
+        raise JoltedModException("Error generating wiki content.") from e
 
     return wiki_content
 
@@ -119,3 +135,8 @@ async def create_curriculum(
             }
         curriculum[topic_name] = topic_content
     return curriculum
+
+
+if __name__ == "__main__":
+    # asyncio.run(create_notebook_module("Intro to for loops in python", model="gpt-4"))
+    asyncio.run(create_notebook_module("Intro to for loops in python", model="gpt-4"))

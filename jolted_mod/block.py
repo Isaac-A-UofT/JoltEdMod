@@ -1,6 +1,14 @@
 from abc import ABC, abstractmethod
 from jolted_mod.cell_type import CellType
 from jolted_mod.config import prompts
+from typing import Optional
+from enum import Enum, auto
+
+
+class BLOCK_TYPES(Enum):
+    SEED_BLOCK = auto()
+    EXPLANATORY_BLOCK = auto()
+    KNOWLEDGE_TESTING_BLOCK = auto()
 
 
 class Block(ABC):
@@ -30,7 +38,7 @@ class SeedBlock(Block):
         topic: str,
         target_audience: str,
         context=None,
-        type="SeedBlock",
+        type="SEED_BLOCK",
     ):
         self.identity = identity
         self.topic = topic
@@ -49,24 +57,28 @@ class ExplanatoryBlock(Block):
     def __init__(
         self,
         topic: str,
-        method_of_teaching: str,
+        knowledge_component: str,
+        instructional_event: str,
         target_audience: str,
         cell_type: str,
-        context=None,
-        type="ExplanatoryBlock",
+        context: Optional[int] = None,
+        type="EXPLANATORY_BLOCK",
     ):
         self.topic = topic
-        self.method_of_teaching = method_of_teaching
+        self.knowledge_component = knowledge_component
+        self.instructional_event = instructional_event
         self.target_audience = target_audience
+        self.context = context
         super().__init__(CellType[cell_type.upper()], type=type)
 
     def generate_prompt(self) -> str:
         type_of_cell = "Markdown" if self.cell_type == CellType.MARKDOWN else "Code"
-        return prompts["ExplanatoryBlock"].format(
+        return prompts["ExplanatoryBlockKC"].format(
             type_of_cell=type_of_cell,
             topic=self.topic,
-            method_of_teaching=self.method_of_teaching,
+            instructional_event=self.instructional_event,
             target_audience=self.target_audience,
+            knowledge_component=self.knowledge_component,
         )
 
 
@@ -77,30 +89,35 @@ class KnowledgeTestingBlock(Block):
         question_type: str,
         target_audience: str,
         topic: str,
+        knowledge_component: str,
         cell_type: str,
-        context=None,
-        type="KnowledgeTestingBlock",
+        context: Optional[Block],
+        type="KNOWLEDGE_TESTING_BLOCK",
     ):
         self.n = n
         self.question_type = question_type
         self.target_audience = target_audience
         self.topic = topic
+        self.knowledge_component = knowledge_component
+        self.context = context
         super().__init__(CellType[cell_type.upper()], type=type)
 
     def generate_prompt(self) -> str:
         if self.cell_type == CellType.MARKDOWN:
-            return prompts["KnowledgeTestingBlock"]["markdown"].format(
+            return prompts["KnowledgeTestingBlockKC"]["markdown"].format(
                 n=self.n,
                 question_type=self.question_type,
                 target_audience=self.target_audience,
                 topic=self.topic,
+                knowledge_component=self.knowledge_component,
             )
         else:
             context_content = self.context.content if self.context else ""
-            return prompts["KnowledgeTestingBlock"]["code"].format(
+            return prompts["KnowledgeTestingBlockKC"]["code"].format(
                 n=self.n,
                 question_type=self.question_type,
                 target_audience=self.target_audience,
                 topic=self.topic,
                 context_content=context_content,
+                knowledge_component=self.knowledge_component,
             )
