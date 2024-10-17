@@ -17,7 +17,7 @@ from tutorials_generator.block_factory import BlockFactory
 
 
 class ContentGenerator:
-    def __init__(self, model="gpt-3.5-turbo", system_block=None, max_tokens=1024, n=1, stop=None, temperature=0.7, blocks=None):
+    def __init__(self, model="gpt-4o", system_block=None, max_tokens=1024, n=1, stop=None, temperature=0.7, blocks=None):
         self.model = model
         self.system_block = system_block
         self.max_tokens = max_tokens
