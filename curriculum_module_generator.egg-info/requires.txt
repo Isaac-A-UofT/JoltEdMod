@@ -1,5 +1,0 @@
-openai
-nbformat
-markdown2
-markdownify
-tqdm

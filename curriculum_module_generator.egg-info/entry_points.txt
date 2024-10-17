@@ -1,2 +1,0 @@
-[console_scripts]
-curriculum_module_generator = curriculum_module_generator.main:main

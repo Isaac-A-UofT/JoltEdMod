@@ -14,36 +14,57 @@ This project is a content generator that creates educational materials for a giv
 
 ### Prerequisites
 
-* Python 3.6 or higher
+* Python 3.9 or higher
 
-* OpenAI Python API
+* Poetry ([installation guide](https://pypi.org/project/poetry/))
+
+* OpenAI user API key ([get one here](https://platform.openai.com/settings/profile?tab=api-keys))
 
 * Jupyter Notebook (to view the generated tutorial)
-
-* nbformat
-
-* markdown2
-
-* markdownify
 
 ### Installation
 
 1. Clone this repository.
 
-2. Install the required packages using pip:
+2. Install the required packages using poetry:
 
-```pip install -r requirements.txt```
+    ```
+    poetry install
+    ```
 
-3. Set the OPENAI_API_KEY environment variable with your OpenAI API key:
+3. Set the `OPENAI_API_KEY` environment variable with your OpenAI API key:
 
-```export OPENAI_API_KEY=<your_api_key>```
+- **For macOS and Linux**:
 
+    ```
+    export OPENAI_API_KEY=<your_api_key>
+    ```
+
+- **For Windows PowerShell**:
+
+    ```
+    $env:OPENAI_API_KEY="<your_api_key>"
+    ```
 
 ### Usage
 
-1. Run the script with the desired command-line arguments:
+1. To activate the virtual environment, run:
 
-```curriculum_module_generator --topic <topic> [--identity <identity>] [--target_audience <target_audience>] [--tutorial_output_file <tutorial_output_file>] [--wiki_output_file <wiki_output_file>] [--model <model>]```
+    ```
+    poetry shell
+    ```
+
+    You can also run individual scripts or commands within the Poetry environment without activating it by using:
+
+    ```
+    poetry run python your_script.py
+    ```
+
+2. Run the script with the desired command-line arguments:
+
+    ```
+    curriculum_module_generator --topic <topic> [--identity <identity>] [--target_audience <target_audience>] [--tutorial_output_file <tutorial_output_file>] [--wiki_output_file <wiki_output_file>] [--model <model>]
+    ```
 
 Required arguments:
 
@@ -61,6 +82,12 @@ Optional arguments:
 
 * --model: The OpenAI GPT model to use for generating cell content (default: "gpt-3.5-turbo")
 The generated content will be saved in the specified output files.
+
+3. To exit poetry shell, enter the command:
+
+    ```bash
+    exit
+    ```
 
 ### Contributing
 Feel free to submit issues or pull requests to improve this project.
