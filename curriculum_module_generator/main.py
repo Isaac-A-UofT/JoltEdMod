@@ -9,7 +9,7 @@ def cli():
     parser.add_argument("--target_audience", default="first year computer science students", help="The target audience for the content")
     parser.add_argument('--tutorial_output_file', type=str, default="output.ipynb", help='Path to the tutorial output file. Defaults to output.ipynb.')
     parser.add_argument('--wiki_output_file', type=str, default="output.md", help='Path to the wiki output file. Defaults to output.md.')
-    parser.add_argument('--model', type=str, default="gpt-3.5-turbo", help='The OpenAI GPT model to use for generating cell content. Defaults to gpt-3.5-turbo.')
+    parser.add_argument('--model', type=str, default="gpt-4o", help='The OpenAI GPT model to use for generating cell content. Defaults to gpt-4o.')
 
     args = parser.parse_args()
     main(args.topic, args.identity, args.target_audience, args.model, args.tutorial_output_file, args.wiki_output_file)

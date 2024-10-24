@@ -3,12 +3,12 @@ from curriculum_module_generator.cell_type import CellType
 
 
 class Block(ABC):
-    def __init__(self, cell_type: CellType, content: str = "", context=None, type="Base"):
+    def __init__(self, cell_type: CellType, entry: str, content: str = "", context=None, type="Base"):
         self.cell_type = cell_type
         self.context = context
         self.content = content
         self.type = type
-
+        self.entry = entry
     def set_context(self, context_block):
         self.context = context_block
 
@@ -22,11 +22,11 @@ class Block(ABC):
 
 
 class SeedBlock(Block):
-    def __init__(self, identity: str, topic: str, target_audience: str, context=None, type="SeedBlock"):
+    def __init__(self, identity: str, entry: str, topic: str, target_audience: str, context=None, type="SeedBlock"):
         self.identity = identity
         self.topic = topic
         self.target_audience = target_audience
-        super().__init__(CellType.MARKDOWN, type=type)
+        super().__init__(CellType.MARKDOWN, entry=entry, type=type)
 
     def generate_prompt(self) -> str:
         return f"Behave as a {self.identity} who is explaining {self.topic} to {self.target_audience}"
@@ -39,13 +39,14 @@ class ExplanatoryBlock(Block):
         method_of_teaching: str,
         target_audience: str,
         cell_type: str,
+        entry: str,
         context=None,
-        type="ExplanatoryBlock"
+        type="ExplanatoryBlock",
     ):
         self.topic = topic
         self.method_of_teaching = method_of_teaching
         self.target_audience = target_audience
-        super().__init__(CellType[cell_type.upper()], type=type)
+        super().__init__(CellType[cell_type.upper()], entry=entry, type=type)
 
     def generate_prompt(self) -> str:
         type_of_cell = (
@@ -62,18 +63,23 @@ class KnowledgeTestingBlock(Block):
         target_audience: str,
         topic: str,
         cell_type: str,
+        entry: str,
         context=None,
-        type="KnowledgeTestingBlock"
+        language=None,
+        type="KnowledgeTestingBlock",
     ):
         self.n = n
         self.question_type = question_type
         self.target_audience = target_audience
         self.topic = topic
-        super().__init__(CellType[cell_type.upper()], type=type)
+        super().__init__(CellType[cell_type.upper()], entry=entry, type=type)
+    
+    def set_language(self, language: str):
+        self.language = language
 
     def generate_prompt(self) -> str:
         if self.cell_type == CellType.MARKDOWN:
             return f"Design {self.n} {self.question_type} of an appropriate difficulty for {self.target_audience} about that {self.topic}"
         else:
             if self.context:
-                return f"Create code with empty methods that have comments for what they should do but no implementation to answer the following question: {self.context.content}. After that, create 3 assertion tests that the student will use to test if they have implemented their"
+                return f"Create code with empty methods that have comments for what they should do but no implementation to answer the following question: {self.context.content}. After that, create 3 assertion tests that the student will use to test if they have implemented their functions. Your response should have nothing but the code and comments"

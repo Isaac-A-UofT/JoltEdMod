@@ -62,7 +62,7 @@ class TemplateGenerator:
                     "type": "SeedBlock",
                     "identity": self.identity,
                     "topic": self.topic,
-                    "target_audience": self.target_audience
+                    "target_audience": self.target_audience,
                 },
                 {
                     "type": "ExplanatoryBlock",

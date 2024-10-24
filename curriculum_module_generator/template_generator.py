@@ -14,7 +14,8 @@ class TemplateGenerator:
                     "type": "SeedBlock",
                     "identity": self.identity,
                     "topic": self.topic,
-                    "target_audience": self.target_audience
+                    "target_audience": self.target_audience,
+                    "entry": "tutorial"
                 },
                 {
                     "type": "ExplanatoryBlock",
@@ -22,7 +23,8 @@ class TemplateGenerator:
                     "method_of_teaching": "a metaphor without code",
                     "target_audience": self.target_audience,
                     "context": None,
-                    "cell_type": "MARKDOWN"
+                    "cell_type": "MARKDOWN",
+                    "entry": "tutorial"
                 },
                 {
                     "type": "ExplanatoryBlock",
@@ -30,7 +32,8 @@ class TemplateGenerator:
                     "method_of_teaching": "a concrete code example that's thoroughly commented",
                     "target_audience": self.target_audience,
                     "context": None,
-                    "cell_type": "MARKDOWN"
+                    "cell_type": "MARKDOWN",
+                    "entry": "tutorial"
                 },
                 {
                     "type": "KnowledgeTestingBlock",
@@ -39,7 +42,8 @@ class TemplateGenerator:
                     "topic": self.topic,
                     "target_audience": self.target_audience,
                     "context": None,
-                    "cell_type": "MARKDOWN"
+                    "cell_type": "MARKDOWN",
+                    "entry": "tutorial"
                 },
                 {
                     "type": "KnowledgeTestingBlock",
@@ -48,7 +52,8 @@ class TemplateGenerator:
                     "topic": self.topic,
                     "target_audience": self.target_audience,
                     "cell_type": "CODE",
-                    "context": 3
+                    "context": 3,
+                    "entry": "tutorial"
                 }
             ]
         }
@@ -61,7 +66,8 @@ class TemplateGenerator:
                     "type": "SeedBlock",
                     "identity": self.identity,
                     "topic": self.topic,
-                    "target_audience": self.target_audience
+                    "target_audience": self.target_audience,
+                    "entry": "wiki"
                 },
                 {
                     "type": "ExplanatoryBlock",
@@ -69,7 +75,8 @@ class TemplateGenerator:
                     "method_of_teaching": "a metaphor without code",
                     "target_audience": self.target_audience,
                     "context": None,
-                    "cell_type": "MARKDOWN"
+                    "cell_type": "MARKDOWN",
+                    "entry": "wiki"
                 },
                 {
                     "type": "ExplanatoryBlock",
@@ -77,7 +84,8 @@ class TemplateGenerator:
                     "method_of_teaching": "a concrete code example that's thoroughly commented",
                     "target_audience": self.target_audience,
                     "context": None,
-                    "cell_type": "MARKDOWN"
+                    "cell_type": "MARKDOWN",
+                    "entry": "wiki"
                 },
                 {
                     "type": "ExplanatoryBlock",
@@ -85,7 +93,8 @@ class TemplateGenerator:
                     "method_of_teaching": "3 example use cases",
                     "target_audience": self.target_audience,
                     "context": None,
-                    "cell_type": "MARKDOWN"
+                    "cell_type": "MARKDOWN",
+                    "entry": "wiki"
                 },
                 {
                     "type": "KnowledgeTestingBlock",
@@ -94,7 +103,8 @@ class TemplateGenerator:
                     "topic": self.topic,
                     "target_audience": self.target_audience,
                     "context": None,
-                    "cell_type": "MARKDOWN"
+                    "cell_type": "MARKDOWN",
+                    "entry": "wiki"
                 }
             ]
         }
