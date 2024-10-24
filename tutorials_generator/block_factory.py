@@ -1,10 +1,11 @@
-from tutorials_generator.block import Block, SeedBlock, ExplanatoryBlock, KnowledgeTestingBlock
+from tutorials_generator.block import Block, SeedBlock, ExplanatoryBlock, KnowledgeTestingBlock, CurriculumBlock
 
 class BlockFactory:
     BLOCK_TYPES = {
         'SeedBlock': SeedBlock,
         'ExplanatoryBlock': ExplanatoryBlock,
         'KnowledgeTestingBlock': KnowledgeTestingBlock,
+        'CurriculumBlock': CurriculumBlock,
     }
     
     @staticmethod

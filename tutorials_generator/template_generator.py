@@ -1,6 +1,5 @@
 import json
 
-
 class TemplateGenerator:
 
     def __init__(self, topic, identity, target_audience):
@@ -15,7 +14,8 @@ class TemplateGenerator:
                     "type": "SeedBlock",
                     "identity": self.identity,
                     "topic": self.topic,
-                    "target_audience": self.target_audience
+                    "target_audience": self.target_audience,
+                    "entry": "tutorial"
                 },
                 {
                     "type": "ExplanatoryBlock",
@@ -23,7 +23,8 @@ class TemplateGenerator:
                     "method_of_teaching": "a metaphor without code",
                     "target_audience": self.target_audience,
                     "context": None,
-                    "cell_type": "MARKDOWN"
+                    "cell_type": "MARKDOWN",
+                    "entry": "tutorial"
                 },
                 {
                     "type": "ExplanatoryBlock",
@@ -31,7 +32,8 @@ class TemplateGenerator:
                     "method_of_teaching": "a concrete code example that's thoroughly commented",
                     "target_audience": self.target_audience,
                     "context": None,
-                    "cell_type": "MARKDOWN"
+                    "cell_type": "MARKDOWN",
+                    "entry": "tutorial"
                 },
                 {
                     "type": "KnowledgeTestingBlock",
@@ -40,7 +42,8 @@ class TemplateGenerator:
                     "topic": self.topic,
                     "target_audience": self.target_audience,
                     "context": None,
-                    "cell_type": "MARKDOWN"
+                    "cell_type": "MARKDOWN",
+                    "entry": "tutorial"
                 },
                 {
                     "type": "KnowledgeTestingBlock",
@@ -49,12 +52,13 @@ class TemplateGenerator:
                     "topic": self.topic,
                     "target_audience": self.target_audience,
                     "cell_type": "CODE",
-                    "context": 3
+                    "context": 3,
+                    "entry": "tutorial"
                 }
             ]
         }
         return template
-
+    
     def generate_wiki_template(self):
         template = {
             "blocks": [
@@ -63,6 +67,7 @@ class TemplateGenerator:
                     "identity": self.identity,
                     "topic": self.topic,
                     "target_audience": self.target_audience,
+                    "entry": "wiki"
                 },
                 {
                     "type": "ExplanatoryBlock",
@@ -70,7 +75,8 @@ class TemplateGenerator:
                     "method_of_teaching": "a metaphor without code",
                     "target_audience": self.target_audience,
                     "context": None,
-                    "cell_type": "MARKDOWN"
+                    "cell_type": "MARKDOWN",
+                    "entry": "wiki"
                 },
                 {
                     "type": "ExplanatoryBlock",
@@ -78,7 +84,8 @@ class TemplateGenerator:
                     "method_of_teaching": "a concrete code example that's thoroughly commented",
                     "target_audience": self.target_audience,
                     "context": None,
-                    "cell_type": "MARKDOWN"
+                    "cell_type": "MARKDOWN",
+                    "entry": "wiki"
                 },
                 {
                     "type": "ExplanatoryBlock",
@@ -86,7 +93,8 @@ class TemplateGenerator:
                     "method_of_teaching": "3 example use cases",
                     "target_audience": self.target_audience,
                     "context": None,
-                    "cell_type": "MARKDOWN"
+                    "cell_type": "MARKDOWN",
+                    "entry": "wiki"
                 },
                 {
                     "type": "KnowledgeTestingBlock",
@@ -95,17 +103,28 @@ class TemplateGenerator:
                     "topic": self.topic,
                     "target_audience": self.target_audience,
                     "context": None,
-                    "cell_type": "MARKDOWN"
+                    "cell_type": "MARKDOWN",
+                    "entry": "wiki"
                 }
             ]
         }
+        return template
+    
+    def generate_curriculum_template(self):
+        template = {
+                    "type": "CurriculumBlock",
+                    "identity": self.identity,
+                    "topic": self.topic,
+                    "target_audience": self.target_audience,
+                    "entry": "curriculum"
+                },
         return template
 
     def save_tutorial_template_to_file(self, file_path):
         template = self.generate_tutorial_template()
         with open(file_path, 'w') as f:
             json.dump(template, f, indent=2)
-
+    
     def save_wiki_template_to_file(self, file_path):
         template = self.generate_wiki_template()
         with open(file_path, 'w') as f:

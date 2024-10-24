@@ -6,6 +6,7 @@ import aiohttp
 import aiofiles
 import nbformat as nbf
 import markdown2
+import re
 from markdownify import markdownify as md
 import json
 import uuid
@@ -159,7 +160,16 @@ class ContentGenerator:
                     stop=self.stop,
                     temperature=self.temperature,
                 )
-                block.set_content(response["choices"][0]["message"]["content"])
+                # Get the content from the response
+                response_content = response["choices"][0]["message"]["content"]
+
+                if block.type == "KnowledgeTestingBlock" and block.entry == "tutorial":
+                    # Split the content into blocks based on language identifiers
+                    language, response_content = self.parse_code_blocks(response_content)
+
+                    block.set_language(language)
+
+                block.set_content(response_content)
                 break  # If the response was successful, break out of the loop
 
             except Exception as e:
@@ -189,7 +199,16 @@ class ContentGenerator:
                     stop=self.stop,
                     temperature=self.temperature,
                 )
-                block.set_content(response["choices"][0]["message"]["content"])
+                # Get the content from the response
+                response_content = response["choices"][0]["message"]["content"]
+
+                if block.type == "KnowledgeTestingBlock" and block.entry == "tutorial":
+                    # Split the content into blocks based on language identifiers
+                    language, response_content = self.parse_code_blocks(response_content)
+
+                    block.set_language(language)
+
+                block.set_content(response_content)
                 break  # If successful, break out of the loop
 
             except Exception as e:
@@ -234,3 +253,25 @@ class ContentGenerator:
                     await asyncio.sleep(wait_time)
                 else:
                     raise  # If it's another exception, raise it as usual
+    @staticmethod  
+    def parse_code_blocks(content):
+        """Parse the API response content to extract code blocks and their languages."""
+
+        code_blocks = []
+        pattern = r'```(\w*)\n(.*?)```'  # Language is optional
+        matches = re.findall(pattern, content, re.DOTALL)
+
+        # If matches are found, process them
+        if matches:
+            first_lang = matches[0][0] if matches[0][0] else None  # Get the first language
+            combined_code = []
+
+            for lang, code in matches:
+                if lang == first_lang or first_lang is None:  # Append code to combined_code
+                    combined_code.append(code.strip())
+            
+            # Append the first language (or None) and the combined code as a single string
+            return (first_lang, '\n'.join(combined_code))
+        else:
+            # If no code blocks are found, return the entire content with None for language
+            return (None, content.strip())

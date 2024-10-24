@@ -57,13 +57,18 @@ This project is a content generator that creates educational materials for a giv
     You can also run individual scripts or commands within the Poetry environment without activating it by using:
 
     ```
-    poetry run python your_script.py
+    poetry run python file_name.py
     ```
 
 2. Run the script with the desired command-line arguments:
 
     ```
-    curriculum_module_generator --topic <topic> [--identity <identity>] [--target_audience <target_audience>] [--tutorial_output_file <tutorial_output_file>] [--wiki_output_file <wiki_output_file>] [--model <model>]
+    tutorial_generator module  --topic <topic> [--identity <identity>] [--target_audience <target_audience>] [--tutorial_output_file <tutorial_output_file>] [--wiki_output_file <wiki_output_file>] [--model <model>]
+    ```
+    or, for a more robust version, run:
+
+    ```
+    tutorial_generator curriculum --topic <topic> [--identity <identity>] [--target_audience <target_audience>] [--tutorial_output_file <tutorial_output_file>] [--wiki_output_file <wiki_output_file>] [--model <model>] [--curriculum_file <curriculum_file>] [-i]
     ```
 
 Required arguments:

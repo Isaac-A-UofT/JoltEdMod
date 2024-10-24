@@ -3,9 +3,10 @@ import json
 import os
 from tutorials_generator.template_generator import TemplateGenerator
 from tutorials_generator.content_generator import ContentGenerator
+from tutorials_generator.curriculum_generator import CurriculumGenerator
 
 
-def create_module(topic, identity = 'professor of computer science', target_audience='first year computer science students', tutorial_output_file='output.ipynb', wiki_output_file='output.md', model='gpt-3.5-turbo'):
+def create_module(topic, identity = 'professor of computer science', target_audience='first year computer science students', tutorial_output_file='output.ipynb', wiki_output_file='output.md', model='gpt-4o'):
 
     # Generate and save the template
     template_generator = TemplateGenerator(topic, identity, target_audience)
@@ -31,7 +32,7 @@ def cli():
 @click.option('--target_audience', default='first year computer science students', help='The target audience for the content')
 @click.option('--tutorial_output_file', type=click.Path(), default='output.ipynb', help='Path to the tutorial output file. Defaults to output.ipynb.')
 @click.option('--wiki_output_file', type=click.Path(), default='output.md', help='Path to the wiki output file. Defaults to output.md.')
-@click.option('--model', type=str, default='gpt-3.5-turbo', help='The OpenAI GPT model to use for generating cell content. Defaults to gpt-3.5-turbo.')
+@click.option('--model', type=str, default='gpt-4o', help='The OpenAI GPT model to use for generating cell content. Defaults to gpt-3.5-turbo.')
 @click.option('--interactive', '-i', is_flag=True, help='Interactive mode')
 def module(topic, identity, target_audience, tutorial_output_file, wiki_output_file, model, interactive):
     if interactive:
@@ -45,7 +46,7 @@ def module(topic, identity, target_audience, tutorial_output_file, wiki_output_f
         wiki_output_file = click.prompt(
             'Enter the path to the wiki output file', default='output.md')
         model = click.prompt(
-            'Enter the OpenAI GPT model to use for generating cell content', default='gpt-3.5-turbo')
+            'Enter the OpenAI GPT model to use for generating cell content', default='gpt-4o')
 
     # Generate and save the template
     template_generator = TemplateGenerator(topic, identity, target_audience)
@@ -59,18 +60,17 @@ def module(topic, identity, target_audience, tutorial_output_file, wiki_output_f
     cg.create_notebook(tutorial_template_file, tutorial_output_file)
     cg.create_wiki(wiki_template_file, wiki_output_file)
 
-
+@click.command()
 @click.option('--identity', default='Professor of Computer Science', help='The identity of the content creator')
 @click.option('--target_audience', default='first year computer science students', help='The target audience for the content')
-@click.option('--model', type=str, default='gpt-3.5-turbo', help='The OpenAI GPT model to use for generating cell content. Defaults to gpt-3.5-turbo.')
+@click.option('--model', type=str, default='gpt-4o', help='The OpenAI GPT model to use for generating cell content. Defaults to gpt-3.5-turbo.')
 @click.option('--curriculum_file', help="file containing the curriculum")
 @click.option('--interactive', '-i', is_flag=True, help='Interactive mode')
-@click.command()
 def curriculum(identity, target_audience, model, curriculum_file, interactive):
     if interactive:
         curriculum_file = click.prompt('Enter the path to the curriculum file')
         model = click.prompt(
-            'Enter the OpenAI GPT model to use for generating cell content', default='gpt-3.5-turbo')
+            'Enter the OpenAI GPT model to use for generating cell content', default='gpt-4o')
 
     if not curriculum_file:
         raise click.UsageError("A curriculum file must be provided.")
@@ -100,10 +100,36 @@ def curriculum(identity, target_audience, model, curriculum_file, interactive):
     # loops through module creation based on the contents of the curriculum file
     # the curriculum file will contain a json object that contains a list of topics
     # we will assume that eacch topic will become a module and use the same target audience, mrtywerydel, and identity
+@click.command()
+@click.option('--topic', help='The topic for the content')
+@click.option('--identity', default='Professor of Computer Science', help='The identity of the content creator')
+@click.option('--target_audience', default='first year computer science students', help='The target audience for the content')
+@click.option('--curriculum_output_file', type=click.Path(), default='curriculum.json', help='Path to the curriculum output file. Defaults to curriculum.json.')
+@click.option('--model', type=str, default='gpt-4o', help='The OpenAI GPT model to use for generating cell content. Defaults to gpt-3.5-turbo.')
+@click.option('--interactive', '-i', is_flag=True, help='Interactive mode')
+def curriculum_template(topic, identity, target_audience, curriculum_output_file, model, interactive):
+    if interactive:
+        topic = click.prompt('Enter the topic for the content')
+        identity = click.prompt(
+            'Enter the identity of the content creator', default='Professor of Computer Science')
+        target_audience = click.prompt(
+            'Enter the target audience for the content', default='first year computer science students')
+        curriculum_output_file = click.prompt(
+            'Enter the path to the curriculum output file', default='curriculum.json')
+        model = click.prompt(
+            'Enter the OpenAI GPT model to use for generating cell content', default='gpt-4o')
 
+    # Generate and save the template
+    ctg = CurriculumGenerator(model=model)
+    ctg.generate_curriculum_template(topic, identity, target_audience, curriculum_output_file)
+
+    # loops through module creation based on the contents of the curriculum file
+    # the curriculum file will contain a json object that contains a list of topics
+    # we will assume that eacch topic will become a module and use the same target audience, mrtywerydel, and identity
 
 cli.add_command(module)
 cli.add_command(curriculum)
+cli.add_command(curriculum_template)
 
 if __name__ == '__main__':
     cli()
