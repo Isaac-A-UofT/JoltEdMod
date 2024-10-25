@@ -46,13 +46,21 @@ class ContentGenerator:
         return nb
 
     def _generate_notebook_blocks(self, blocks, nb):
-        """Generate notebook cells from given blocks."""
         for block in blocks:
-            if block.cell_type == CellType.CODE:
+            if str(block.cell_type) == str(CellType.CODE):
                 new_cell = nbf.v4.new_code_cell(block.content)
                 new_cell['id'] = str(uuid.uuid4())  # Generate and set cell id
+                # Set the language in the metadata
+                if hasattr(block, 'language') and block.language:
+                    new_cell.metadata['language'] = block.language
+                    new_cell.metadata['kernelspec'] = {
+                        "display_name": block.language.capitalize(),
+                        "language": block.language,
+                        "name": block.language.lower()
+                    }
+                
                 nb.cells.append(new_cell)
-            elif block.cell_type == CellType.MARKDOWN:
+            elif str(block.cell_type) == str(CellType.MARKDOWN):
                 nb.cells.append(nbf.v4.new_markdown_cell(block.content))
         return nb
 
@@ -67,7 +75,7 @@ class ContentGenerator:
     async def _create_markdown_file_async(self, blocks, file_path):
         """Create a markdown file from the given blocks."""
         markdown_text = ""
-        async with aiofiles.open(file_path, "w") as f:
+        async with aiofiles.open(file_path, "w", encoding="utf-8") as f:
             for block in blocks:
                 markdown_text += f"{markdown2.markdown(block.content)}"
             await f.write(md(markdown_text))

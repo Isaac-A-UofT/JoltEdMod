@@ -87,9 +87,9 @@ def curriculum(identity, target_audience, model, curriculum_file, interactive):
 
     for topic_index, topic in enumerate(curriculum_data['topics']):
         topic_name = topic['name']
-        os.makedirs(f"Curriculum/Wiki/{topic_name}", exist_ok=True)
+        os.makedirs(f"Curriculum/Wiki/{topic_index}_{topic_name}", exist_ok=True)
         os.makedirs(
-            f"Curriculum/Interactive_Tutorials/{topic_name}", exist_ok=True)
+            f"Curriculum/Interactive_Tutorials/{topic_index}_{topic_name}", exist_ok=True)
 
         for subtopic_index, subtopic in enumerate(topic['subtopics']):
             tutorial_output_file = f"Curriculum/Interactive_Tutorials/{topic_name}/subtopic_{subtopic_index}.ipynb"

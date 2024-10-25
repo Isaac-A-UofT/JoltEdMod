@@ -63,12 +63,7 @@ This project is a content generator that creates educational materials for a giv
 2. Run the script with the desired command-line arguments:
 
     ```
-    tutorial_generator module  --topic <topic> [--identity <identity>] [--target_audience <target_audience>] [--tutorial_output_file <tutorial_output_file>] [--wiki_output_file <wiki_output_file>] [--model <model>]
-    ```
-    or, for a more robust version, run:
-
-    ```
-    tutorial_generator curriculum --topic <topic> [--identity <identity>] [--target_audience <target_audience>] [--tutorial_output_file <tutorial_output_file>] [--wiki_output_file <wiki_output_file>] [--model <model>] [--curriculum_file <curriculum_file>] [-i]
+    tutorial_generator module --topic <topic> [--identity <identity>] [--target_audience <target_audience>] [--tutorial_output_file <tutorial_output_file>] [--wiki_output_file <wiki_output_file>] [--model <model>]
     ```
 
 Required arguments:
@@ -85,10 +80,24 @@ Optional arguments:
 
 * --wiki_output_file: Path to the wiki output file (default: "output.md")
 
-* --model: The OpenAI GPT model to use for generating cell content (default: "gpt-3.5-turbo")
+* --model: The OpenAI GPT model to use for generating cell content (default: "gpt-4o")
 The generated content will be saved in the specified output files.
 
-3. To exit poetry shell, enter the command:
+3. additional features:
+
+    You can run this command to generate a full curriculum template
+    
+    ```
+    tutorial_generator curriculum_template --topic <topic> [--identity <identity>] [--target_audience <target_audience>] [--curriculum_output_file <curriculum_output_file>] [--model <model>] [--interactive] 
+    ```
+
+    Then, run this command to generate modules from the template
+
+    ```
+    tutorial_generator curriculum --identity <identity> [--target_audience <target_audience>] [--model <model>] [--curriculum_file <curriculum_file>] [--interactive]
+    ```
+
+4. To exit poetry shell, enter the command:
 
     ```bash
     exit

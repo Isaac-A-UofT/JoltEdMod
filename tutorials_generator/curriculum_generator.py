@@ -3,8 +3,6 @@ import openai
 import time
 import re
 from tqdm import tqdm
-from markdownify import markdownify as md
-from tqdm import tqdm
 from tutorials_generator.block_factory import BlockFactory
 
 class CurriculumGenerator:
@@ -77,7 +75,7 @@ class CurriculumGenerator:
     
     def create_markdown_file(self, blocks, file_path):
         content = ""
-        with open(file_path, "w") as f:
+        with open(file_path, "w", encoding='utf-8') as f:
             for block in blocks:
                 content += block.content
 
