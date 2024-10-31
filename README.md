@@ -103,6 +103,49 @@ The generated content will be saved in the specified output files.
     exit
     ```
 
+## API Documentation
+
+1. To run the API, run:
+    ```
+    poetry run uvicorn main:app --reload
+    ```
+
+### POST `/generate_curriculum`
+
+Generates a curriculum template based on the provided topic, identity, and target audience.
+
+**Request Body:**
+- `topic` (string): The main subject or theme for the curriculum.
+- `identity` (string): The identity or role of the user requesting the curriculum (e.g., "teacher" or "student").
+- `target_audience` (string): The intended audience for the curriculum (e.g., "beginners" or "advanced learners").
+
+Example:
+```json
+{
+  "topic": "Data Science",
+  "identity": "teacher",
+  "target_audience": "beginners"
+}
+```
+
+### POST `/generate_module`
+
+Generates a module template based on the provided topic, identity, and target audience.
+
+**Request Body:**
+- `topic` (string): The main subject or theme for the curriculum.
+- `identity` (string): The identity or role of the user requesting the curriculum (e.g., "teacher" or "student").
+- `target_audience` (string): The intended audience for the curriculum (e.g., "beginners" or "advanced learners").
+
+Example:
+```json
+{
+  "topic": "Data Science",
+  "identity": "teacher",
+  "target_audience": "beginners"
+}
+```
+
 ### Contributing
 Feel free to submit issues or pull requests to improve this project.
 
