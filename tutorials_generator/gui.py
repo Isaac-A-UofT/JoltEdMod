@@ -1,7 +1,7 @@
 import gradio as gr
 import os
 from tutorials_generator.template_generator import TemplateGenerator
-from tutorials_generator.content_generator import ContentGenerator
+from tutorials_generator.api_content_generator import ContentGenerator
 
 def generate_content(topic, identity, target_audience, model, tutorial_output_file, wiki_output_file):
     # Generate and save the template

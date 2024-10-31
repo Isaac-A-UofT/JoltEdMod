@@ -7,6 +7,7 @@ import aiofiles
 import nbformat as nbf
 import markdown2
 import re
+import inspect
 from markdownify import markdownify as md
 import json
 import uuid
@@ -36,7 +37,7 @@ class ContentGenerator:
 
     def create_notebook(self, config_file, output_file):
         """Create a Jupyter Notebook file from the given config file."""
-        asyncio.run(self._create_notebook_async(config_file, output_file))
+        return asyncio.create_task(self._create_notebook_async(config_file, output_file))
 
     async def _create_notebook_async(self, config_file, output_file):
         nb = nbf.v4.new_notebook()
@@ -66,7 +67,7 @@ class ContentGenerator:
 
     def create_wiki(self, config_file, output_file):
         """Create a wiki file from the given config file."""
-        asyncio.run(self._create_wiki_async(config_file, output_file))
+        return asyncio.create_task(self._create_wiki_async(config_file, output_file))
 
     async def _create_wiki_async(self, config_file, output_file):
         blocks = await self._create_content_async(config_file)
@@ -82,7 +83,7 @@ class ContentGenerator:
 
     def create_content(self, config_file):
         """Create content for blocks from the given config file."""
-        return asyncio.run(self._create_content_async(config_file))
+        return asyncio.create_task(self._create_content_async(config_file))
 
     async def _create_content_async(self, config_file):
         async with aiohttp.ClientSession() as self._session:

@@ -1,7 +1,7 @@
 import json
 import os
 from tutorials_generator.template_generator import TemplateGenerator
-from tutorials_generator.content_generator import ContentGenerator
+from tutorials_generator.api_content_generator import ContentGenerator
 from tutorials_generator.curriculum_generator import CurriculumGenerator
 
 
