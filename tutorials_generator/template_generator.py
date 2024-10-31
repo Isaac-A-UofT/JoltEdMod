@@ -1,4 +1,5 @@
 import json
+import os
 
 class TemplateGenerator:
 
@@ -122,10 +123,14 @@ class TemplateGenerator:
 
     def save_tutorial_template_to_file(self, file_path):
         template = self.generate_tutorial_template()
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, 'w') as f:
             json.dump(template, f, indent=2)
-    
+
     def save_wiki_template_to_file(self, file_path):
         template = self.generate_wiki_template()
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, 'w') as f:
             json.dump(template, f, indent=2)

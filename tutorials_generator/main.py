@@ -50,10 +50,13 @@ def module(topic, identity, target_audience, tutorial_output_file, wiki_output_f
 
     # Generate and save the template
     template_generator = TemplateGenerator(topic, identity, target_audience)
-    tutorial_template_file = 'tutorial_template.json'
-    wiki_template_file = 'wiki_template.json'
-    template_generator.save_tutorial_template_to_file(tutorial_template_file)
-    template_generator.save_wiki_template_to_file(wiki_template_file)
+    tutorial_template_file = f'./modules/{topic}/{identity}/{target_audience}/tutorial_template.json'
+    wiki_template_file = f'./modules/{topic}/{identity}/{target_audience}/wiki_template.json'
+    if not os.path.exists(tutorial_template_file):
+        template_generator.save_tutorial_template_to_file(tutorial_template_file)
+
+    if not os.path.exists(wiki_template_file):
+        template_generator.save_wiki_template_to_file(wiki_template_file)
 
     # Generate cell content using the ContentGenerator
     cg = ContentGenerator(model=model)
@@ -63,10 +66,11 @@ def module(topic, identity, target_audience, tutorial_output_file, wiki_output_f
 @click.command()
 @click.option('--identity', default='Professor of Computer Science', help='The identity of the content creator')
 @click.option('--target_audience', default='first year computer science students', help='The target audience for the content')
-@click.option('--model', type=str, default='gpt-4o', help='The OpenAI GPT model to use for generating cell content. Defaults to gpt-3.5-turbo.')
+@click.option('--model', type=str, default='gpt-4o', help='The OpenAI GPT model to use for generating cell content. Defaults to gpt-4o-turbo.')
+@click.option('--curriculum_file_destination', default='Curriculum', help = "file where the curriculum will be written to")
 @click.option('--curriculum_file', help="file containing the curriculum")
 @click.option('--interactive', '-i', is_flag=True, help='Interactive mode')
-def curriculum(identity, target_audience, model, curriculum_file, interactive):
+def curriculum(identity, target_audience, model, curriculum_file_destination, curriculum_file, interactive):
     if interactive:
         curriculum_file = click.prompt('Enter the path to the curriculum file')
         model = click.prompt(
@@ -74,6 +78,9 @@ def curriculum(identity, target_audience, model, curriculum_file, interactive):
 
     if not curriculum_file:
         raise click.UsageError("A curriculum file must be provided.")
+    
+    if not curriculum_file_destination:
+        curriculum_file_destination = "./Curriculum"
 
     with open(curriculum_file) as f:
         curriculum_data = json.load(f)
@@ -82,8 +89,8 @@ def curriculum(identity, target_audience, model, curriculum_file, interactive):
         raise click.UsageError(
             "The curriculum file must contain a 'topics' key with a list of topics.")
 
-    os.makedirs("Curriculum/Wiki", exist_ok=True)
-    os.makedirs("Curriculum/Interactive_Tutorials", exist_ok=True)
+    os.makedirs(f"{curriculum_file_destination}/Wiki", exist_ok=True)
+    os.makedirs(f"{curriculum_file_destination}/Interactive_Tutorials", exist_ok=True)
 
     for topic_index, topic in enumerate(curriculum_data['topics']):
         topic_name = topic['name']

@@ -94,7 +94,7 @@ The generated content will be saved in the specified output files.
     Then, run this command to generate modules from the template
 
     ```
-    tutorial_generator curriculum --identity <identity> [--target_audience <target_audience>] [--model <model>] [--curriculum_file <curriculum_file>] [--interactive]
+    tutorial_generator curriculum --identity <identity> [--target_audience <target_audience>] [--model <model>] [--curriculum_file_destination <curriculum_file_destination>] [--curriculum_file <curriculum_file>] [--interactive]
     ```
 
 4. To exit poetry shell, enter the command:

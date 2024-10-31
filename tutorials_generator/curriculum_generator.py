@@ -1,9 +1,10 @@
 import os
 import openai
-import time
+import asyncio
 import re
 from tqdm import tqdm
 from tutorials_generator.block_factory import BlockFactory
+import aiofiles
 
 class CurriculumGenerator:
     def __init__(self, model="gpt-4o", system_block=None, max_tokens=1024, n=1, stop=None, temperature=0.7, blocks=None):
@@ -25,7 +26,7 @@ class CurriculumGenerator:
         if not openai.api_key:
             raise ValueError("Environment variable OPENAI_API_KEY not set")
     
-    def generate_curriculum_template(self, topic, identity, target, output):
+    async def generate_curriculum_template(self, topic, identity, target, output):
         self.template = {
             "blocks": [
                 {
@@ -44,10 +45,10 @@ class CurriculumGenerator:
                 }
             ]
         }
-        blocks = self._create_content()
-        self.create_markdown_file(blocks, output)
+        blocks = await self._create_content()  # Wait for content generation to complete
+        await self.create_markdown_file(blocks, output)
     
-    def _create_content(self):
+    async def _create_content(self):
         blocks = self.parse_config_file(self)
 
         if blocks[0].type == 'SeedBlock':
@@ -56,7 +57,8 @@ class CurriculumGenerator:
         else:
             self.system_block = None
 
-        self.generate_all_block_content(blocks)
+        # Generate content for all blocks asynchronously
+        await self.generate_all_block_content(blocks)  # Wait for all content generation
         return blocks
 
     @staticmethod
@@ -67,49 +69,45 @@ class CurriculumGenerator:
             blocks.append(block)
         return blocks
 
-    def generate_all_block_content(self, blocks):
+    async def generate_all_block_content(self, blocks):
         with tqdm(total=len(blocks), desc="Generating block content") as pbar:
-            for block in blocks:
-                self.generate_block_content(block)
-                pbar.update(1)
-    
-    def create_markdown_file(self, blocks, file_path):
+            tasks = [self.generate_block_content(block) for block in blocks]
+            await asyncio.gather(*tasks)  # Wait for all tasks to complete
+            pbar.update(len(blocks))  # Update progress bar after all blocks are done
+
+    async def create_markdown_file(self, blocks, file_path):
         content = ""
-        with open(file_path, "w", encoding='utf-8') as f:
+        async with aiofiles.open(file_path, "w", encoding='utf-8') as f:
             for block in blocks:
                 content += block.content
 
             cleaned_text = re.sub(r'```.*', '', content)
-            f.write(cleaned_text)
+            await f.write(cleaned_text)
     
-    def generate_block_content(self, block):
+    async def generate_block_content(self, block):
         while True:
             try:
-                response = openai.ChatCompletion.create(
+                response = await openai.ChatCompletion.acreate(
                     model=self.model,
-                    messages=[
-                        {
-                            "role": "system",
-                            "content": self.system_block.generate_prompt(),
-                        },
-                        {"role": "user", "content": block.generate_prompt()},
-                    ],
+                    messages=[{
+                        "role": "system",
+                        "content": self.system_block.generate_prompt(),
+                    }, {
+                        "role": "user",
+                        "content": block.generate_prompt(),
+                    }],
                     max_tokens=self.max_tokens,
                     n=self.n,
                     stop=self.stop,
                     temperature=self.temperature,
                 )
-                # Get the content from the response
                 response_content = response["choices"][0]["message"]["content"]
                 block.set_content(response_content)
-                break  # If successful, break out of the loop
-
+                break 
             except Exception as e:
-                if "429" in str(e):  # Check if the error code is 429
-                    wait_time = 60  # You can set this to the desired waiting time in seconds
-                    print(
-                        f"Error 429 encountered. Retrying in {wait_time} seconds...")
-                    time.sleep(wait_time)
+                if "429" in str(e):
+                    wait_time = 60
+                    print(f"Error 429 encountered. Retrying in {wait_time} seconds...")
+                    await asyncio.sleep(wait_time)
                 else:
-                    raise  # If it's another exception, raise it as usual
-            
+                    raise
