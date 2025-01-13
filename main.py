@@ -3,13 +3,15 @@ from typing import Optional
 import uuid
 import json
 from pydantic import BaseModel
-from api_tutorials_generator.api_helper import module, curriculum, curriculum_template
+import nbformat
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
+from api_tutorials_generator.api_helper import module, curriculum, curriculum_template
+
+REGION = "us-east-2"
 
 # Initialize the S3 client
-s3_client = boto3.client("s3")
-
+s3_client = s3_client = boto3.client("s3")
 
 app = FastAPI()
 
@@ -67,28 +69,31 @@ async def create_module(request: ModuleRequest):
         request.target_audience,
         request.generate_wiki or False
     )
-    if result.status != 200:
-        raise HTTPException(status_code=result.status, detail=f"Failed generate file")    
+    if result['status'] != 200:
+        raise HTTPException(status_code=result['status'], detail=f"Failed generate file")    
     try:
         # Define the bucket name and file name with UUID
-        bucket_name = "joltEdMod-modules"
+        bucket_name = "joltedmod"
         unique_id = str(uuid.uuid4())
         file_name = f"{request.topic.replace(' ', '_')}_{unique_id}.ipynb"
 
         # Upload the notebook to S3
-        s3_client.put_object(
-            Bucket=bucket_name,
-            Key=file_name,
-            Body=result.notebook,
-            ContentType="application/json"
-        )
+
+        try:
+            notebook_raw_text = nbformat.writes(result['notebook'])
+            s3_client.put_object(
+                Bucket=bucket_name,
+                Key=file_name,
+                Body=notebook_raw_text,
+                ContentType="text/plain"  # Change content type to 'text/plain'
+            )
+        except Exception as e:
+            print(f"Error during S3 put_object: {e}")
+            raise
+
 
         # Generate a pre-signed URL for the uploaded file
-        file_url = s3_client.generate_presigned_url(
-            "get_object",
-            Params={"Bucket": bucket_name, "Key": file_name},
-            ExpiresIn=3600*24  # Link expires in 1 hour
-        )
+        file_url = f"https://{bucket_name}.s3.{REGION}.amazonaws.com/{file_name}"
         return {"status": 200, "url": file_url}
 
     except (BotoCoreError, ClientError) as e:
