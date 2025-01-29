@@ -71,6 +71,10 @@ async def create_curriculum(request: CurriculumRequest):
     )
     return result
 
+@app.post("/test")
+async def create_module():
+     return {"status": 200, "return": True}
+
 # POST endpoint for module
 @app.post("/generate_module")
 async def create_module(request: ModuleRequest):
