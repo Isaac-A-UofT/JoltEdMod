@@ -7,6 +7,7 @@ import nbformat
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
 from api_tutorials_generator.api_helper import module, curriculum, curriculum_template
+from fastapi.middleware.cors import CORSMiddleware
 
 REGION = "us-east-2"
 IDENTITY="Professor of Computer Science"
@@ -19,6 +20,13 @@ s3_client = s3_client = boto3.client("s3")
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class CurriculumRequest(BaseModel):
     topic: str
