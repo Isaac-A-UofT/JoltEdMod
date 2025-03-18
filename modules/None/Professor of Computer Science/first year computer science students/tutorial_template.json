@@ -1,0 +1,49 @@
+{
+  "blocks": [
+    {
+      "type": "SeedBlock",
+      "identity": "Professor of Computer Science",
+      "topic": null,
+      "target_audience": "first year computer science students",
+      "entry": "tutorial"
+    },
+    {
+      "type": "ExplanatoryBlock",
+      "topic": null,
+      "method_of_teaching": "a metaphor without code",
+      "target_audience": "first year computer science students",
+      "context": null,
+      "cell_type": "MARKDOWN",
+      "entry": "tutorial"
+    },
+    {
+      "type": "ExplanatoryBlock",
+      "topic": null,
+      "method_of_teaching": "a concrete code example that's thoroughly commented",
+      "target_audience": "first year computer science students",
+      "context": null,
+      "cell_type": "MARKDOWN",
+      "entry": "tutorial"
+    },
+    {
+      "type": "KnowledgeTestingBlock",
+      "n": 1,
+      "question_type": "programming problem",
+      "topic": null,
+      "target_audience": "first year computer science students",
+      "context": null,
+      "cell_type": "MARKDOWN",
+      "entry": "tutorial"
+    },
+    {
+      "type": "KnowledgeTestingBlock",
+      "n": 1,
+      "question_type": "programming problem",
+      "topic": null,
+      "target_audience": "first year computer science students",
+      "cell_type": "CODE",
+      "context": 3,
+      "entry": "tutorial"
+    }
+  ]
+}

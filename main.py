@@ -5,6 +5,7 @@ import json
 from pydantic import BaseModel
 import nbformat
 import boto3
+from mangum import Mangum
 from botocore.exceptions import BotoCoreError, ClientError
 from api_tutorials_generator.api_helper import module, curriculum, curriculum_template
 
@@ -15,7 +16,7 @@ GENERATE_WIKI=False
 MODEL="gpt-4o"
 
 # Initialize the S3 client
-s3_client = s3_client = boto3.client("s3")
+s3_client = boto3.client("s3")
 
 app = FastAPI()
 
@@ -62,10 +63,8 @@ async def create_curriculum(request: CurriculumRequest):
     )
     return result
 
-# POST endpoint for module
 @app.post("/generate_module")
 async def create_module(request: ModuleRequest):
-    # Generate the module
     result = await generate_module(
         request.topic,
         request.identity,
@@ -73,7 +72,8 @@ async def create_module(request: ModuleRequest):
         request.generate_wiki or GENERATE_WIKI
     )
     if result['status'] != 200:
-        raise HTTPException(status_code=result['status'], detail=f"Failed to generate file")    
+        raise HTTPException(status_code=result['status'], detail="Failed to generate file")    
+    
     try:
         # Define the bucket name and file name with UUID
         bucket_name = "joltedmod"
@@ -81,7 +81,6 @@ async def create_module(request: ModuleRequest):
         file_name = f"{request.topic.replace(' ', '_')}_{unique_id}.ipynb"
 
         # Upload the notebook to S3
-
         try:
             notebook_raw_text = nbformat.writes(result['notebook'])
             s3_client.put_object(
@@ -94,10 +93,9 @@ async def create_module(request: ModuleRequest):
             print(f"Error during S3 put_object: {e}")
             raise
 
-
         # Generate a pre-signed URL for the uploaded file
         file_url = f"https://{bucket_name}.s3.{REGION}.amazonaws.com/{file_name}"
         return {"status": 200, "url": file_url}
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to send file")
+        raise HTTPException(status_code=500, detail="Failed to send file")
