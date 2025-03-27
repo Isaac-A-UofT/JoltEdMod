@@ -1,5 +1,4 @@
 import json
-import os
 
 class TemplateGenerator:
 
@@ -110,27 +109,15 @@ class TemplateGenerator:
             ]
         }
         return template
-    
-    def generate_curriculum_template(self):
-        template = {
-                    "type": "CurriculumBlock",
-                    "identity": self.identity,
-                    "topic": self.topic,
-                    "target_audience": self.target_audience,
-                    "entry": "curriculum"
-                },
-        return template
+
+
 
     def save_tutorial_template_to_file(self, file_path):
         template = self.generate_tutorial_template()
-        # Ensure the directory exists
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, 'w') as f:
             json.dump(template, f, indent=2)
-
+    
     def save_wiki_template_to_file(self, file_path):
         template = self.generate_wiki_template()
-        # Ensure the directory exists
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, 'w') as f:
             json.dump(template, f, indent=2)

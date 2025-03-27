@@ -54,6 +54,7 @@ class ExplanatoryBlock(Block):
         )
         return f"This is a {type_of_cell} block in a Jupyter Notebook. Use appropriate headers for chapter sections if of type Markdown. Explain {self.topic} by {self.method_of_teaching} in a way that is relatable to {self.target_audience}. Be careful not to be overly dramatic and not to talk down to the audience regardless of their level of expertise."
 
+
 class KnowledgeTestingBlock(Block):
     def __init__(
         self,
@@ -82,24 +83,3 @@ class KnowledgeTestingBlock(Block):
         else:
             if self.context:
                 return f"Create code with empty methods that have comments for what they should do but no implementation to answer the following question: {self.context.content}. After that, create 3 assertion tests that the student will use to test if they have implemented their functions. Your response should have nothing but the code and comments"
-
-class CurriculumBlock(Block):
-    def __init__(self, identity: str, entry: str, topic: str, target_audience: str, context=None, type="SeedBlock"):
-        self.identity = identity
-        self.topic = topic
-        self.target_audience = target_audience
-        super().__init__(CellType.MARKDOWN, entry=entry, type=type)
-
-    def generate_prompt(self) -> str:
-        return f"""Behave as a {self.identity} teaching a course on {self.topic} to {self.target_audience}.
-                    Write a JSON for the curriculum of the course with the following format: 
-                    {{
-                        "topics": [
-                            {{
-                                "name": "",
-                                "subtopics": [""]
-                            }}
-                        ]
-                    }}
-                    Include at least 10 topics, each with at least 3 subtopics.
-                    Include only the JSON file and nothing else."""

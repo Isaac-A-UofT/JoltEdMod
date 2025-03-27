@@ -3,18 +3,15 @@ import openai
 import asyncio
 import time
 import aiohttp
-import aiofiles
 import nbformat as nbf
 import markdown2
 import re
 from markdownify import markdownify as md
-import json
 import uuid
 from alive_progress import alive_bar
 from colorama import Fore, Style
-from tutorials_generator.block import Block
-from tutorials_generator.cell_type import CellType
-from tutorials_generator.block_factory import BlockFactory
+from api_tutorials_generator.cell_type import CellType
+from api_tutorials_generator.block_factory import BlockFactory
 
 
 class ContentGenerator:
@@ -34,15 +31,14 @@ class ContentGenerator:
         if not openai.api_key:
             raise ValueError("Environment variable OPENAI_API_KEY not set")
 
-    def create_notebook(self, config_file, output_file):
+    def create_notebook(self, content):
         """Create a Jupyter Notebook file from the given config file."""
-        asyncio.run(self._create_notebook_async(config_file, output_file))
+        return asyncio.create_task(self._create_notebook_async(content))
 
-    async def _create_notebook_async(self, config_file, output_file):
+    async def _create_notebook_async(self, content):
         nb = nbf.v4.new_notebook()
-        blocks = await self._create_content_async(config_file)
+        blocks = await self._create_content_async(content)
         self._generate_notebook_blocks(blocks, nb)
-        nbf.write(nb, output_file)
         return nb
 
     def _generate_notebook_blocks(self, blocks, nb):
@@ -64,30 +60,29 @@ class ContentGenerator:
                 nb.cells.append(nbf.v4.new_markdown_cell(block.content))
         return nb
 
-    def create_wiki(self, config_file, output_file):
+    def create_wiki(self, content):
         """Create a wiki file from the given config file."""
-        asyncio.run(self._create_wiki_async(config_file, output_file))
+        return asyncio.create_task(self._create_wiki_async(content))
 
-    async def _create_wiki_async(self, config_file, output_file):
-        blocks = await self._create_content_async(config_file)
-        await self._create_markdown_file_async(blocks, output_file)
+    async def _create_wiki_async(self, content):
+        blocks = await self._create_content_async(content)
+        return await self._create_markdown_file_async(blocks)
 
-    async def _create_markdown_file_async(self, blocks, file_path):
+    async def _create_markdown_file_async(self, blocks):
         """Create a markdown file from the given blocks."""
         markdown_text = ""
-        async with aiofiles.open(file_path, "w", encoding="utf-8") as f:
-            for block in blocks:
-                markdown_text += f"{markdown2.markdown(block.content)}"
-            await f.write(md(markdown_text))
+        for block in blocks:
+            markdown_text += f"{markdown2.markdown(block.content)}"
+        return markdown_text
 
     def create_content(self, config_file):
         """Create content for blocks from the given config file."""
-        return asyncio.run(self._create_content_async(config_file))
+        return asyncio.create_task(self._create_content_async(config_file))
 
-    async def _create_content_async(self, config_file):
+    async def _create_content_async(self, content):
         async with aiohttp.ClientSession() as self._session:
-            blocks = self._parse_config_file(config_file)
-            self._update_context(config_file, blocks)
+            blocks = self._parse_config_file(content)
+            self._update_context(content, blocks)
 
             if blocks[0].type == 'SeedBlock':
                 self.system_block = blocks[0]
@@ -99,24 +94,20 @@ class ContentGenerator:
             return blocks
 
     @staticmethod
-    def _update_context(config_file, blocks):
+    def _update_context(content, blocks):
         """Update block context using the given config file."""
-        with open(config_file) as f:
-            config = json.load(f)
-            for block, block_config in zip(blocks, config['blocks']):
-                if 'context' in block_config and block_config['context'] is not None:
-                    block.set_context(blocks[block_config['context']])
+        for block, block_config in zip(blocks, content['blocks']):
+            if 'context' in block_config and block_config['context'] is not None:
+                block.set_context(blocks[block_config['context']])
 
     @staticmethod
-    def _parse_config_file(config_file):
+    def _parse_config_file(content):
         """Parse the given config file and create blocks."""
-        with open(config_file) as f:
-            config = json.load(f)
-            blocks = []
-            for block_config in config['blocks']:
-                block = BlockFactory.create_block(block_config)
-                blocks.append(block)
-            return blocks
+        blocks = []
+        for block_config in content['blocks']:
+            block = BlockFactory.create_block(block_config)
+            blocks.append(block)
+        return blocks
 
     async def _generate_all_block_content_async(self, blocks):
         """Generate content for all blocks asynchronously."""
